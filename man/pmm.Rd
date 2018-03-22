@@ -26,7 +26,7 @@ to implement an efficient way of doing predictive mean matching on top
 of any prediction based missing value imputation. It works as follows:
 For each predicted value of a vector \code{xtest}, the closest \code{k} 
 predicted values of another vector \code{xtrain} are identified by 
-k-nearest neighbour. Then, one of those neighbours are randomly picked 
+k-nearest neighbour. Then, one of those neighbours is randomly picked 
 and its corresponding observed value in \code{ytrain} is returned.
 }
 \examples{

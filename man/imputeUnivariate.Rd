@@ -20,4 +20,5 @@ non-missing value to run.
 \examples{
 imputeUnivariate(c(NA, 0, 1, 0, 1))
 imputeUnivariate(c("A", "A", NA))
+imputeUnivariate(as.factor(c("A", "A", NA)))
 }

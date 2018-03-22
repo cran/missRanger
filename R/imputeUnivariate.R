@@ -12,8 +12,9 @@
 #' @examples
 #' imputeUnivariate(c(NA, 0, 1, 0, 1))
 #' imputeUnivariate(c("A", "A", NA))
+#' imputeUnivariate(as.factor(c("A", "A", NA)))
 imputeUnivariate <- function(x) {
-  stopifnot(is.vector(x), length(x) >= 1L)
+  stopifnot(is.atomic(x), length(x) >= 1L)
   ok <- !is.na(x)
   if (any(!ok)) {
     x[!ok] <- sample(x[ok], sum(!ok), replace = TRUE)
