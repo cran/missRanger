@@ -1,8 +1,6 @@
-# missRanger 1.0.1
+# missRanger 1.0.2
 
-* fixed a bug that causes "missRanger" to stop if each variable contains a missing and the very first imputed variable is a factor.
-
-* better handling of the seed in "missRanger"
+* added argument "verbose" to control how much info is printed to screen. 0 to print nothing. 1 (default) to print a "." per iteration and variable, 2 to print the OOB prediction error per iteration and variable (1 minus R-squared for regression).
 
 
 

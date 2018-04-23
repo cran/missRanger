@@ -36,7 +36,7 @@ head(irisImputed_et)
 ```
 
 ## Installation
-Release 1.0.1 on CRAN
+Release 1.0.2 on CRAN
 ```
 install.packages("missRanger")
 ```

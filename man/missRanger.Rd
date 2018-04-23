@@ -4,7 +4,8 @@
 \alias{missRanger}
 \title{Fast Imputation of Missing Values by Chained Tree Ensembles}
 \usage{
-missRanger(data, maxiter = 10L, pmm.k = 0L, seed = NULL, ...)
+missRanger(data, maxiter = 10L, pmm.k = 0L, seed = NULL, verbose = 1,
+  ...)
 }
 \arguments{
 \item{data}{A \code{data.frame} with missing values to impute.}
@@ -14,6 +15,9 @@ missRanger(data, maxiter = 10L, pmm.k = 0L, seed = NULL, ...)
 \item{pmm.k}{Number of candidate non-missing values to sample from in the predictive mean matching step. 0 to avoid this step.}
 
 \item{seed}{Integer seed to initialize the random generator.}
+
+\item{verbose}{Controls how much info is printed to screen. 0 to print nothing. 1 (default) to print a "." per iteration and 
+variable, 2 to print the OOB prediction error per iteration and variable (1 minus R-squared for regression).}
 
 \item{...}{Arguments passed to \code{ranger}. If the data set is large, better use less trees 
 (e.g. \code{num.trees = 100}) and/or a low value of \code{sample.fraction}. 
@@ -29,7 +33,8 @@ Between the iterative model fitting, it offers the option of predictive mean mat
 with values not present in the original data (like a value 0.3334 in a 0-1 coded variable). Secondly, predictive mean
 matching tries to raise the variance in the resulting conditional distributions to a realistic level and, as such, 
 allows to do multiple imputation when repeating the call to missRanger(). The iterative chaining stops as soon as \code{maxiter}
-is reached or if the average out-of-bag estimate of performance stops improving.
+is reached or if the average out-of-bag estimate of performance stops improving. In the latter case, except for the first iteration,
+the second last (i.e. best) imputed data is returned.
 }
 \examples{
 irisWithNA <- generateNA(iris)
