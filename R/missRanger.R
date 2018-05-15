@@ -10,7 +10,7 @@
 #' allows to do multiple imputation when repeating the call to missRanger(). The iterative chaining stops as soon as \code{maxiter}
 #' is reached or if the average out-of-bag estimate of performance stops improving. In the latter case, except for the first iteration,
 #' the second last (i.e. best) imputed data is returned.
-#' @param data A \code{data.frame} with missing values to impute.
+#' @param data A \code{data.frame} or \code{tibble} with missing values to impute.
 #' @param maxiter Maximum number of chaining iterations.
 #' @param pmm.k Number of candidate non-missing values to sample from in the predictive mean matching step. 0 to avoid this step.
 #' @param seed Integer seed to initialize the random generator.
@@ -92,7 +92,7 @@ missRanger <- function(data, maxiter = 10L, pmm.k = 0L, seed = NULL, verbose = 1
       v.na <- data.na[, v]
       
       if (length(completed) == 0L) {
-        data[, v] <- imputeUnivariate(data[, v])
+        data[[v]] <- imputeUnivariate(data[[v]])
       } else {
         fit <- ranger(formula = reformulate(completed, response = v), 
                       data = data[!v.na, union(v, completed)],
@@ -100,9 +100,9 @@ missRanger <- function(data, maxiter = 10L, pmm.k = 0L, seed = NULL, verbose = 1
         pred <- predict(fit, data[v.na, allVars])$predictions
         data[v.na, v] <- if (pmm.k) pmm(xtrain = fit$predictions, 
                                         xtest = pred, 
-                                        ytrain = data[!v.na, v], 
+                                        ytrain = data[[v]][!v.na], 
                                         k = pmm.k) else pred
-        predError[[v]] <- fit$prediction.error / (if (fit$treetype == "Regression") var(data[!v.na, v]) else 1)
+        predError[[v]] <- fit$prediction.error / (if (fit$treetype == "Regression") var(data[[v]][!v.na]) else 1)
         
         if (is.nan(predError[[v]])) {
           predError[[v]] <- 0
@@ -110,6 +110,7 @@ missRanger <- function(data, maxiter = 10L, pmm.k = 0L, seed = NULL, verbose = 1
       }
       
       completed <- union(completed, v)
+      
       if (verbose == 1) {
         cat(".")
       } else if (verbose >= 2) {

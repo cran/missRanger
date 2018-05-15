@@ -8,7 +8,7 @@ missRanger(data, maxiter = 10L, pmm.k = 0L, seed = NULL, verbose = 1,
   ...)
 }
 \arguments{
-\item{data}{A \code{data.frame} with missing values to impute.}
+\item{data}{A \code{data.frame} or \code{tibble} with missing values to impute.}
 
 \item{maxiter}{Maximum number of chaining iterations.}
 

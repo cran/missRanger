@@ -35,8 +35,19 @@ irisImputed_et <- missRanger(irisWithNA, pmm.k = 3, splitrule = "extratrees", nu
 head(irisImputed_et)
 ```
 
+Since release 1.0.3, thanks to Andrew Landgraf, it is now possible to use in line with `tidyverse`.
+``` r
+library(tidyverse)
+
+iris %>% 
+  as.tibble %>% 
+  generateNA %>% 
+  missRanger(verbose = 0) %>% 
+  head
+
+```
 ## Installation
-Release 1.0.2 on CRAN
+Release 1.0.3 on CRAN
 ```
 install.packages("missRanger")
 ```
