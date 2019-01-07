@@ -1,12 +1,12 @@
-be9016f016f45f482cf83c347e69b45b *DESCRIPTION
+f7c6c9512521650448e11b06809f5e81 *DESCRIPTION
 8c30f365ccc51c6a9dfa572d83336ee5 *NAMESPACE
-f50e5acb79b5a1828c4f65e6ccac463d *NEWS.md
+37d90d9c9bfc91af44a55a1ff2730089 *NEWS.md
 e51a9a9dfdf64251a4a29e637f1f8f5c *R/generateNA.R
 40e8d53f3874c13dbc5965991ed39ede *R/imputeUnivariate.R
-44d2a6f7c31e40c4bb7f6b2e8baaf94e *R/missRanger.R
+d632aaff11412889a7a01cb014680ee5 *R/missRanger.R
 dfc65ebfc91da10c3d047d47dcd073ad *R/pmm.R
-9dca1f56a3de4b057e8e0627ce9faf12 *README.md
+a70adabe5402f77b256ba95f0f189f08 *README.md
 2ad31fca31020fe560069238541a58d6 *man/generateNA.Rd
 34b32e985efcad40862598ad05ef7571 *man/imputeUnivariate.Rd
-c33ea01db45fd59393d9fd4780190eb9 *man/missRanger.Rd
+8f8232494e6c33675e076fe8b445d8fc *man/missRanger.Rd
 35d48557e31219c38544b140737a9707 *man/pmm.Rd
