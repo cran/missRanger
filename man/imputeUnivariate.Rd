@@ -4,21 +4,31 @@
 \alias{imputeUnivariate}
 \title{Univariate Imputation}
 \usage{
-imputeUnivariate(x)
+imputeUnivariate(x, v = NULL, seed = NULL)
 }
 \arguments{
-\item{x}{A vector of any type possibly containing missing values.}
+\item{x}{A vector, matrix or data frame.}
+
+\item{v}{A character vector of column names to impute (only relevant if \code{x} is a data frame). The default \code{NULL} imputes all columns.}
+
+\item{seed}{An integer seed.}
 }
 \value{
-A vector of the same length and type as \code{x} but without missing values.
+\code{x} with imputed values.
 }
 \description{
-Fills missing values of a vector of any type by sampling 
-with replacement from the non-missing values. Requires at least one 
-non-missing value to run.
+Fills missing values of a vector, matrix or data frame 
+by sampling with replacement from the non-missing values. For data frames, 
+this sampling is done within column.
 }
 \examples{
 imputeUnivariate(c(NA, 0, 1, 0, 1))
 imputeUnivariate(c("A", "A", NA))
 imputeUnivariate(as.factor(c("A", "A", NA)))
+head(imputeUnivariate(generateNA(iris)))
+head(imputeUnivariate(generateNA(iris), v = "Species"))
+head(imputeUnivariate(generateNA(iris), v = c("Species", "Petal.Length")))
+}
+\author{
+Michael Mayer
 }
