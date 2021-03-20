@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="Michael Mayer" />
+
+<meta name="date" content="2021-03-20" />
+
+<title>Using missRanger</title>
+
+<script>// Hide empty <a> tag within highlighted CodeBlock for screen reader accessibility (see https://github.com/jgm/pandoc/issues/6352#issuecomment-626106786) -->
+// v0.0.1
+// Written by JooYoung Seo (jooyoung@psu.edu) and Atsushi Yasumoto on June 1st, 2020.
+
+document.addEventListener('DOMContentLoaded', function() {
+  const codeList = document.getElementsByClassName("sourceCode");
+  for (var i = 0; i < codeList.length; i++) {
+    var linkList = codeList[i].getElementsByTagName('a');
+    for (var j = 0; j < linkList.length; j++) {
+      if (linkList[j].innerHTML === "") {
+        linkList[j].setAttribute('aria-hidden', 'true');
+      }
+    }
+  }
+});
+</script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css" data-origin="pandoc">
+code.sourceCode > span { display: inline-block; line-height: 1.25; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Using missRanger</h1>
+<h4 class="author">Michael Mayer</h4>
+<h4 class="date">2021-03-20</h4>
+
+
+
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>The aim of this vignette is to introduce the R package <code>missRanger</code> for imputation of missing values and to explain how to use it for multiple imputation.</p>
+<p><code>missRanger</code> uses the <code>ranger</code> package <span class="citation">(Wright and Ziegler <a href="#ref-wright" role="doc-biblioref">2017</a>)</span> to do fast missing value imputation by chained random forest. As such, it can be used as an alternative to <code>missForest</code>, a beautiful algorithm introduced in <span class="citation">(Stekhoven and Buehlmann <a href="#ref-stekhoven" role="doc-biblioref">2011</a>)</span>. Basically, each variable is imputed by predictions from a random forest using all other variables as covariables. <code>missRanger</code> iterates multiple times over all variables until the average out-of-bag prediction error of the models stops to improve.</p>
+<p>Why should you consider <code>missRanger</code>?</p>
+<ul>
+<li><p>It is fast.</p></li>
+<li><p>It is flexible and intuitive to apply: E.g. calling <code>missRanger(data, . ~ 1)</code> would impute all variables univariately, <code>missRanger(data, Species ~ Sepal.Width)</code> would use <code>Sepal.Width</code> to impute <code>Species</code>.</p></li>
+<li><p>It can deal with most realistic variable types, even dates and times without destroying the original data structure.</p></li>
+<li><p>It combines random forest imputation with predictive mean matching. This generates realistic variability and avoids “new” values like 0.3334 in a 0-1 coded variable. Like this, <code>missRanger</code> can be used for realistic multiple imputation scenarios, see e.g. <span class="citation">(Rubin <a href="#ref-rubin" role="doc-biblioref">1987</a>)</span> for the statistical background.</p></li>
+</ul>
+<p>In the examples below, we will meet two functions from the <code>missRanger</code> package:</p>
+<ul>
+<li><p><code>generateNA</code>: To replace values in a data set by missing values.</p></li>
+<li><p><code>missRanger</code>: To impute missing values in a data frame.</p></li>
+</ul>
+</div>
+<div id="installation" class="section level2">
+<h2>Installation</h2>
+<p>From CRAN:</p>
+<pre><code>install.packages(&quot;missRanger&quot;)</code></pre>
+<p>Latest version from github:</p>
+<pre><code>library(devtools)
+install_github(&quot;mayer79/missRanger&quot;, subdir = &quot;release/missRanger&quot;)</code></pre>
+</div>
+<div id="examples" class="section level2">
+<h2>Examples</h2>
+<p>We first generate a data set with about 20% missing values per column and fill them again by <code>missRanger</code>.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="kw">library</span>(missRanger)</span>
+<span id="cb3-2"><a href="#cb3-2"></a><span class="kw">library</span>(dplyr)</span>
+<span id="cb3-3"><a href="#cb3-3"></a></span>
+<span id="cb3-4"><a href="#cb3-4"></a><span class="kw">set.seed</span>(<span class="dv">84553</span>)</span>
+<span id="cb3-5"><a href="#cb3-5"></a></span>
+<span id="cb3-6"><a href="#cb3-6"></a><span class="kw">head</span>(iris)</span>
+<span id="cb3-7"><a href="#cb3-7"></a><span class="co">#&gt;   Sepal.Length Sepal.Width Petal.Length Petal.Width Species</span></span>
+<span id="cb3-8"><a href="#cb3-8"></a><span class="co">#&gt; 1          5.1         3.5          1.4         0.2  setosa</span></span>
+<span id="cb3-9"><a href="#cb3-9"></a><span class="co">#&gt; 2          4.9         3.0          1.4         0.2  setosa</span></span>
+<span id="cb3-10"><a href="#cb3-10"></a><span class="co">#&gt; 3          4.7         3.2          1.3         0.2  setosa</span></span>
+<span id="cb3-11"><a href="#cb3-11"></a><span class="co">#&gt; 4          4.6         3.1          1.5         0.2  setosa</span></span>
+<span id="cb3-12"><a href="#cb3-12"></a><span class="co">#&gt; 5          5.0         3.6          1.4         0.2  setosa</span></span>
+<span id="cb3-13"><a href="#cb3-13"></a><span class="co">#&gt; 6          5.4         3.9          1.7         0.4  setosa</span></span>
+<span id="cb3-14"><a href="#cb3-14"></a></span>
+<span id="cb3-15"><a href="#cb3-15"></a><span class="co"># Generate data with missing values in all columns</span></span>
+<span id="cb3-16"><a href="#cb3-16"></a><span class="kw">head</span>(irisWithNA &lt;-<span class="st"> </span><span class="kw">generateNA</span>(iris, <span class="dt">p =</span> <span class="fl">0.2</span>))</span>
+<span id="cb3-17"><a href="#cb3-17"></a><span class="co">#&gt;   Sepal.Length Sepal.Width Petal.Length Petal.Width Species</span></span>
+<span id="cb3-18"><a href="#cb3-18"></a><span class="co">#&gt; 1          5.1         3.5           NA         0.2  setosa</span></span>
+<span id="cb3-19"><a href="#cb3-19"></a><span class="co">#&gt; 2          4.9         3.0          1.4          NA  setosa</span></span>
+<span id="cb3-20"><a href="#cb3-20"></a><span class="co">#&gt; 3          4.7         3.2          1.3         0.2  setosa</span></span>
+<span id="cb3-21"><a href="#cb3-21"></a><span class="co">#&gt; 4           NA          NA           NA         0.2  setosa</span></span>
+<span id="cb3-22"><a href="#cb3-22"></a><span class="co">#&gt; 5          5.0         3.6          1.4          NA  setosa</span></span>
+<span id="cb3-23"><a href="#cb3-23"></a><span class="co">#&gt; 6          5.4         3.9           NA         0.4  setosa</span></span>
+<span id="cb3-24"><a href="#cb3-24"></a> </span>
+<span id="cb3-25"><a href="#cb3-25"></a><span class="co"># Impute missing values with missRanger</span></span>
+<span id="cb3-26"><a href="#cb3-26"></a><span class="kw">head</span>(irisImputed &lt;-<span class="st"> </span><span class="kw">missRanger</span>(irisWithNA, <span class="dt">num.trees =</span> <span class="dv">100</span>))</span>
+<span id="cb3-27"><a href="#cb3-27"></a><span class="co">#&gt; </span></span>
+<span id="cb3-28"><a href="#cb3-28"></a><span class="co">#&gt; Missing value imputation by random forests</span></span>
+<span id="cb3-29"><a href="#cb3-29"></a><span class="co">#&gt; </span></span>
+<span id="cb3-30"><a href="#cb3-30"></a><span class="co">#&gt;   Variables to impute:       Sepal.Length, Sepal.Width, Petal.Length, Petal.Width, Species</span></span>
+<span id="cb3-31"><a href="#cb3-31"></a><span class="co">#&gt;   Variables used to impute:  Sepal.Length, Sepal.Width, Petal.Length, Petal.Width, Species</span></span>
+<span id="cb3-32"><a href="#cb3-32"></a><span class="co">#&gt; iter 1:  .....</span></span>
+<span id="cb3-33"><a href="#cb3-33"></a><span class="co">#&gt; iter 2:  .....</span></span>
+<span id="cb3-34"><a href="#cb3-34"></a><span class="co">#&gt; iter 3:  .....</span></span>
+<span id="cb3-35"><a href="#cb3-35"></a><span class="co">#&gt;   Sepal.Length Sepal.Width Petal.Length Petal.Width Species</span></span>
+<span id="cb3-36"><a href="#cb3-36"></a><span class="co">#&gt; 1     5.100000    3.500000     1.503583   0.2000000  setosa</span></span>
+<span id="cb3-37"><a href="#cb3-37"></a><span class="co">#&gt; 2     4.900000    3.000000     1.400000   0.2845833  setosa</span></span>
+<span id="cb3-38"><a href="#cb3-38"></a><span class="co">#&gt; 3     4.700000    3.200000     1.300000   0.2000000  setosa</span></span>
+<span id="cb3-39"><a href="#cb3-39"></a><span class="co">#&gt; 4     5.673567    3.273117     2.505867   0.2000000  setosa</span></span>
+<span id="cb3-40"><a href="#cb3-40"></a><span class="co">#&gt; 5     5.000000    3.600000     1.400000   0.1914333  setosa</span></span>
+<span id="cb3-41"><a href="#cb3-41"></a><span class="co">#&gt; 6     5.400000    3.900000     1.509900   0.4000000  setosa</span></span></code></pre></div>
+<p>It worked! Unfortunately, the new values look somewhat unnatural due to different rounding. If we would like to avoid this, we just set the <code>pmm.k</code> argument to a positive number. All imputations done during the process are then combined with a predictive mean matching (PMM) step, leading to more natural imputations and improved distributional properties of the resulting values:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="kw">head</span>(irisImputed &lt;-<span class="st"> </span><span class="kw">missRanger</span>(irisWithNA, <span class="dt">pmm.k =</span> <span class="dv">3</span>, <span class="dt">num.trees =</span> <span class="dv">100</span>))</span>
+<span id="cb4-2"><a href="#cb4-2"></a><span class="co">#&gt; </span></span>
+<span id="cb4-3"><a href="#cb4-3"></a><span class="co">#&gt; Missing value imputation by random forests</span></span>
+<span id="cb4-4"><a href="#cb4-4"></a><span class="co">#&gt; </span></span>
+<span id="cb4-5"><a href="#cb4-5"></a><span class="co">#&gt;   Variables to impute:       Sepal.Length, Sepal.Width, Petal.Length, Petal.Width, Species</span></span>
+<span id="cb4-6"><a href="#cb4-6"></a><span class="co">#&gt;   Variables used to impute:  Sepal.Length, Sepal.Width, Petal.Length, Petal.Width, Species</span></span>
+<span id="cb4-7"><a href="#cb4-7"></a><span class="co">#&gt; iter 1:  .....</span></span>
+<span id="cb4-8"><a href="#cb4-8"></a><span class="co">#&gt; iter 2:  .....</span></span>
+<span id="cb4-9"><a href="#cb4-9"></a><span class="co">#&gt; iter 3:  .....</span></span>
+<span id="cb4-10"><a href="#cb4-10"></a><span class="co">#&gt; iter 4:  .....</span></span>
+<span id="cb4-11"><a href="#cb4-11"></a><span class="co">#&gt;   Sepal.Length Sepal.Width Petal.Length Petal.Width Species</span></span>
+<span id="cb4-12"><a href="#cb4-12"></a><span class="co">#&gt; 1          5.1         3.5          1.4         0.2  setosa</span></span>
+<span id="cb4-13"><a href="#cb4-13"></a><span class="co">#&gt; 2          4.9         3.0          1.4         0.2  setosa</span></span>
+<span id="cb4-14"><a href="#cb4-14"></a><span class="co">#&gt; 3          4.7         3.2          1.3         0.2  setosa</span></span>
+<span id="cb4-15"><a href="#cb4-15"></a><span class="co">#&gt; 4          5.8         3.1          1.5         0.2  setosa</span></span>
+<span id="cb4-16"><a href="#cb4-16"></a><span class="co">#&gt; 5          5.0         3.6          1.4         0.2  setosa</span></span>
+<span id="cb4-17"><a href="#cb4-17"></a><span class="co">#&gt; 6          5.4         3.9          1.4         0.4  setosa</span></span></code></pre></div>
+<p>Note that <code>missRanger</code> offers a <code>...</code> argument to pass options to <code>ranger</code>, e.g. <code>num.trees</code> or <code>min.node.size</code>. How would we use its “extra trees” variant with 50 trees?</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a><span class="kw">head</span>(irisImputed_et &lt;-<span class="st"> </span><span class="kw">missRanger</span>(irisWithNA, <span class="dt">pmm.k =</span> <span class="dv">3</span>, <span class="dt">splitrule =</span> <span class="st">&quot;extratrees&quot;</span>, <span class="dt">num.trees =</span> <span class="dv">50</span>))</span>
+<span id="cb5-2"><a href="#cb5-2"></a><span class="co">#&gt; </span></span>
+<span id="cb5-3"><a href="#cb5-3"></a><span class="co">#&gt; Missing value imputation by random forests</span></span>
+<span id="cb5-4"><a href="#cb5-4"></a><span class="co">#&gt; </span></span>
+<span id="cb5-5"><a href="#cb5-5"></a><span class="co">#&gt;   Variables to impute:       Sepal.Length, Sepal.Width, Petal.Length, Petal.Width, Species</span></span>
+<span id="cb5-6"><a href="#cb5-6"></a><span class="co">#&gt;   Variables used to impute:  Sepal.Length, Sepal.Width, Petal.Length, Petal.Width, Species</span></span>
+<span id="cb5-7"><a href="#cb5-7"></a><span class="co">#&gt; iter 1:  .....</span></span>
+<span id="cb5-8"><a href="#cb5-8"></a><span class="co">#&gt; iter 2:  .....</span></span>
+<span id="cb5-9"><a href="#cb5-9"></a><span class="co">#&gt; iter 3:  .....</span></span>
+<span id="cb5-10"><a href="#cb5-10"></a><span class="co">#&gt; iter 4:  .....</span></span>
+<span id="cb5-11"><a href="#cb5-11"></a><span class="co">#&gt;   Sepal.Length Sepal.Width Petal.Length Petal.Width Species</span></span>
+<span id="cb5-12"><a href="#cb5-12"></a><span class="co">#&gt; 1          5.1         3.5          1.3         0.2  setosa</span></span>
+<span id="cb5-13"><a href="#cb5-13"></a><span class="co">#&gt; 2          4.9         3.0          1.4         0.2  setosa</span></span>
+<span id="cb5-14"><a href="#cb5-14"></a><span class="co">#&gt; 3          4.7         3.2          1.3         0.2  setosa</span></span>
+<span id="cb5-15"><a href="#cb5-15"></a><span class="co">#&gt; 4          4.8         2.7          1.3         0.2  setosa</span></span>
+<span id="cb5-16"><a href="#cb5-16"></a><span class="co">#&gt; 5          5.0         3.6          1.4         0.4  setosa</span></span>
+<span id="cb5-17"><a href="#cb5-17"></a><span class="co">#&gt; 6          5.4         3.9          1.3         0.4  setosa</span></span></code></pre></div>
+<p>It is as simple!</p>
+<p>Further note that <code>missRanger</code> does not rely on <code>tidyverse</code> but you can embed it into a <code>dplyr</code> pipeline (without <code>group_by</code>). Make sure to set <code>verbose = 0</code> in order to prevent messages.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a>iris <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb6-2"><a href="#cb6-2"></a><span class="st">  </span><span class="kw">generateNA</span>() <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb6-3"><a href="#cb6-3"></a><span class="st">  </span><span class="kw">missRanger</span>(<span class="dt">verbose =</span> <span class="dv">0</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb6-4"><a href="#cb6-4"></a><span class="st">  </span><span class="kw">head</span>()</span>
+<span id="cb6-5"><a href="#cb6-5"></a><span class="co">#&gt;   Sepal.Length Sepal.Width Petal.Length Petal.Width Species</span></span>
+<span id="cb6-6"><a href="#cb6-6"></a><span class="co">#&gt; 1     5.100000    3.500000     1.400000   0.3102322  setosa</span></span>
+<span id="cb6-7"><a href="#cb6-7"></a><span class="co">#&gt; 2     4.900000    3.038516     1.400000   0.2000000  setosa</span></span>
+<span id="cb6-8"><a href="#cb6-8"></a><span class="co">#&gt; 3     4.700000    3.200000     1.300000   0.2000000  setosa</span></span>
+<span id="cb6-9"><a href="#cb6-9"></a><span class="co">#&gt; 4     4.600000    3.100000     1.500000   0.2000000  setosa</span></span>
+<span id="cb6-10"><a href="#cb6-10"></a><span class="co">#&gt; 5     5.000000    3.211776     1.484725   0.2000000  setosa</span></span>
+<span id="cb6-11"><a href="#cb6-11"></a><span class="co">#&gt; 6     6.691223    3.900000     3.082777   0.4000000  setosa</span></span></code></pre></div>
+<p>By default <code>missRanger</code> uses all columns in the data set to impute all columns with missings. To override this behaviour, you can use an intuitive formula interface: The left hand side specifies the variables to be imputed (variable names separated by a <code>+</code>), while the right hand side lists the variables used for imputation.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="co"># Impute all variables with all (default behaviour). Note that variables without</span></span>
+<span id="cb7-2"><a href="#cb7-2"></a><span class="co"># missing values will be skipped from the left hand side of the formula.</span></span>
+<span id="cb7-3"><a href="#cb7-3"></a><span class="kw">head</span>(m &lt;-<span class="st"> </span><span class="kw">missRanger</span>(irisWithNA, <span class="dt">formula =</span> . <span class="op">~</span><span class="st"> </span>., <span class="dt">pmm.k =</span> <span class="dv">3</span>, <span class="dt">num.trees =</span> <span class="dv">10</span>))</span>
+<span id="cb7-4"><a href="#cb7-4"></a><span class="co">#&gt; </span></span>
+<span id="cb7-5"><a href="#cb7-5"></a><span class="co">#&gt; Missing value imputation by random forests</span></span>
+<span id="cb7-6"><a href="#cb7-6"></a><span class="co">#&gt; </span></span>
+<span id="cb7-7"><a href="#cb7-7"></a><span class="co">#&gt;   Variables to impute:       Sepal.Length, Sepal.Width, Petal.Length, Petal.Width, Species</span></span>
+<span id="cb7-8"><a href="#cb7-8"></a><span class="co">#&gt;   Variables used to impute:  Sepal.Length, Sepal.Width, Petal.Length, Petal.Width, Species</span></span>
+<span id="cb7-9"><a href="#cb7-9"></a><span class="co">#&gt; iter 1:  .....</span></span>
+<span id="cb7-10"><a href="#cb7-10"></a><span class="co">#&gt; iter 2:  .....</span></span>
+<span id="cb7-11"><a href="#cb7-11"></a><span class="co">#&gt; iter 3:  .....</span></span>
+<span id="cb7-12"><a href="#cb7-12"></a><span class="co">#&gt;   Sepal.Length Sepal.Width Petal.Length Petal.Width Species</span></span>
+<span id="cb7-13"><a href="#cb7-13"></a><span class="co">#&gt; 1          5.1         3.5          1.5         0.2  setosa</span></span>
+<span id="cb7-14"><a href="#cb7-14"></a><span class="co">#&gt; 2          4.9         3.0          1.4         0.5  setosa</span></span>
+<span id="cb7-15"><a href="#cb7-15"></a><span class="co">#&gt; 3          4.7         3.2          1.3         0.2  setosa</span></span>
+<span id="cb7-16"><a href="#cb7-16"></a><span class="co">#&gt; 4          6.1         3.0          3.5         0.2  setosa</span></span>
+<span id="cb7-17"><a href="#cb7-17"></a><span class="co">#&gt; 5          5.0         3.6          1.4         0.3  setosa</span></span>
+<span id="cb7-18"><a href="#cb7-18"></a><span class="co">#&gt; 6          5.4         3.9          1.7         0.4  setosa</span></span>
+<span id="cb7-19"><a href="#cb7-19"></a></span>
+<span id="cb7-20"><a href="#cb7-20"></a><span class="co"># Same</span></span>
+<span id="cb7-21"><a href="#cb7-21"></a><span class="kw">head</span>(m &lt;-<span class="st"> </span><span class="kw">missRanger</span>(irisWithNA, <span class="dt">pmm.k =</span> <span class="dv">3</span>, <span class="dt">num.trees =</span> <span class="dv">10</span>))</span>
+<span id="cb7-22"><a href="#cb7-22"></a><span class="co">#&gt; </span></span>
+<span id="cb7-23"><a href="#cb7-23"></a><span class="co">#&gt; Missing value imputation by random forests</span></span>
+<span id="cb7-24"><a href="#cb7-24"></a><span class="co">#&gt; </span></span>
+<span id="cb7-25"><a href="#cb7-25"></a><span class="co">#&gt;   Variables to impute:       Sepal.Length, Sepal.Width, Petal.Length, Petal.Width, Species</span></span>
+<span id="cb7-26"><a href="#cb7-26"></a><span class="co">#&gt;   Variables used to impute:  Sepal.Length, Sepal.Width, Petal.Length, Petal.Width, Species</span></span>
+<span id="cb7-27"><a href="#cb7-27"></a><span class="co">#&gt; iter 1:  .....</span></span>
+<span id="cb7-28"><a href="#cb7-28"></a><span class="co">#&gt; iter 2:  .....</span></span>
+<span id="cb7-29"><a href="#cb7-29"></a><span class="co">#&gt; iter 3:  .....</span></span>
+<span id="cb7-30"><a href="#cb7-30"></a><span class="co">#&gt; iter 4:  .....</span></span>
+<span id="cb7-31"><a href="#cb7-31"></a><span class="co">#&gt; iter 5:  .....</span></span>
+<span id="cb7-32"><a href="#cb7-32"></a><span class="co">#&gt;   Sepal.Length Sepal.Width Petal.Length Petal.Width Species</span></span>
+<span id="cb7-33"><a href="#cb7-33"></a><span class="co">#&gt; 1          5.1         3.5          3.3         0.2  setosa</span></span>
+<span id="cb7-34"><a href="#cb7-34"></a><span class="co">#&gt; 2          4.9         3.0          1.4         0.3  setosa</span></span>
+<span id="cb7-35"><a href="#cb7-35"></a><span class="co">#&gt; 3          4.7         3.2          1.3         0.2  setosa</span></span>
+<span id="cb7-36"><a href="#cb7-36"></a><span class="co">#&gt; 4          5.5         3.1          3.8         0.2  setosa</span></span>
+<span id="cb7-37"><a href="#cb7-37"></a><span class="co">#&gt; 5          5.0         3.6          1.4         0.3  setosa</span></span>
+<span id="cb7-38"><a href="#cb7-38"></a><span class="co">#&gt; 6          5.4         3.9          1.4         0.4  setosa</span></span>
+<span id="cb7-39"><a href="#cb7-39"></a></span>
+<span id="cb7-40"><a href="#cb7-40"></a><span class="co"># Impute all variables with all except Species</span></span>
+<span id="cb7-41"><a href="#cb7-41"></a><span class="kw">head</span>(m &lt;-<span class="st"> </span><span class="kw">missRanger</span>(irisWithNA, . <span class="op">~</span><span class="st"> </span>. <span class="op">-</span><span class="st"> </span>Species, <span class="dt">pmm.k =</span> <span class="dv">3</span>, <span class="dt">num.trees =</span> <span class="dv">10</span>))</span>
+<span id="cb7-42"><a href="#cb7-42"></a><span class="co">#&gt; </span></span>
+<span id="cb7-43"><a href="#cb7-43"></a><span class="co">#&gt; Missing value imputation by random forests</span></span>
+<span id="cb7-44"><a href="#cb7-44"></a><span class="co">#&gt; </span></span>
+<span id="cb7-45"><a href="#cb7-45"></a><span class="co">#&gt;   Variables to impute:       Sepal.Length, Sepal.Width, Petal.Length, Petal.Width, Species</span></span>
+<span id="cb7-46"><a href="#cb7-46"></a><span class="co">#&gt;   Variables used to impute:  Sepal.Length, Sepal.Width, Petal.Length, Petal.Width</span></span>
+<span id="cb7-47"><a href="#cb7-47"></a><span class="co">#&gt; iter 1:  .....</span></span>
+<span id="cb7-48"><a href="#cb7-48"></a><span class="co">#&gt; iter 2:  .....</span></span>
+<span id="cb7-49"><a href="#cb7-49"></a><span class="co">#&gt; iter 3:  .....</span></span>
+<span id="cb7-50"><a href="#cb7-50"></a><span class="co">#&gt; iter 4:  .....</span></span>
+<span id="cb7-51"><a href="#cb7-51"></a><span class="co">#&gt;   Sepal.Length Sepal.Width Petal.Length Petal.Width Species</span></span>
+<span id="cb7-52"><a href="#cb7-52"></a><span class="co">#&gt; 1          5.1         3.5          4.5         0.2  setosa</span></span>
+<span id="cb7-53"><a href="#cb7-53"></a><span class="co">#&gt; 2          4.9         3.0          1.4         0.2  setosa</span></span>
+<span id="cb7-54"><a href="#cb7-54"></a><span class="co">#&gt; 3          4.7         3.2          1.3         0.2  setosa</span></span>
+<span id="cb7-55"><a href="#cb7-55"></a><span class="co">#&gt; 4          6.0         2.7          4.0         0.2  setosa</span></span>
+<span id="cb7-56"><a href="#cb7-56"></a><span class="co">#&gt; 5          5.0         3.6          1.4         0.3  setosa</span></span>
+<span id="cb7-57"><a href="#cb7-57"></a><span class="co">#&gt; 6          5.4         3.9          4.0         0.4  setosa</span></span>
+<span id="cb7-58"><a href="#cb7-58"></a></span>
+<span id="cb7-59"><a href="#cb7-59"></a><span class="co"># Impute Sepal.Width by Species </span></span>
+<span id="cb7-60"><a href="#cb7-60"></a><span class="kw">head</span>(m &lt;-<span class="st"> </span><span class="kw">missRanger</span>(irisWithNA, Sepal.Width <span class="op">~</span><span class="st"> </span>Species, <span class="dt">pmm.k =</span> <span class="dv">3</span>, <span class="dt">num.trees =</span> <span class="dv">10</span>))</span>
+<span id="cb7-61"><a href="#cb7-61"></a><span class="co">#&gt; </span></span>
+<span id="cb7-62"><a href="#cb7-62"></a><span class="co">#&gt; Missing value imputation by random forests</span></span>
+<span id="cb7-63"><a href="#cb7-63"></a><span class="co">#&gt; </span></span>
+<span id="cb7-64"><a href="#cb7-64"></a><span class="co">#&gt;   Variables to impute:       Sepal.Width</span></span>
+<span id="cb7-65"><a href="#cb7-65"></a><span class="co">#&gt;   Variables used to impute:  </span></span>
+<span id="cb7-66"><a href="#cb7-66"></a><span class="co">#&gt; iter 1:  .</span></span>
+<span id="cb7-67"><a href="#cb7-67"></a><span class="co">#&gt;   Sepal.Length Sepal.Width Petal.Length Petal.Width Species</span></span>
+<span id="cb7-68"><a href="#cb7-68"></a><span class="co">#&gt; 1          5.1         3.5           NA         0.2  setosa</span></span>
+<span id="cb7-69"><a href="#cb7-69"></a><span class="co">#&gt; 2          4.9         3.0          1.4          NA  setosa</span></span>
+<span id="cb7-70"><a href="#cb7-70"></a><span class="co">#&gt; 3          4.7         3.2          1.3         0.2  setosa</span></span>
+<span id="cb7-71"><a href="#cb7-71"></a><span class="co">#&gt; 4           NA         2.0           NA         0.2  setosa</span></span>
+<span id="cb7-72"><a href="#cb7-72"></a><span class="co">#&gt; 5          5.0         3.6          1.4          NA  setosa</span></span>
+<span id="cb7-73"><a href="#cb7-73"></a><span class="co">#&gt; 6          5.4         3.9           NA         0.4  setosa</span></span>
+<span id="cb7-74"><a href="#cb7-74"></a></span>
+<span id="cb7-75"><a href="#cb7-75"></a><span class="co"># No success. Why? Species contains missing values and thus can only be used for imputation if it is being imputed as well</span></span>
+<span id="cb7-76"><a href="#cb7-76"></a><span class="kw">head</span>(m &lt;-<span class="st"> </span><span class="kw">missRanger</span>(irisWithNA, Sepal.Width <span class="op">+</span><span class="st"> </span>Species <span class="op">~</span><span class="st"> </span>Species, <span class="dt">pmm.k =</span> <span class="dv">3</span>, <span class="dt">num.trees =</span> <span class="dv">10</span>))</span>
+<span id="cb7-77"><a href="#cb7-77"></a><span class="co">#&gt; </span></span>
+<span id="cb7-78"><a href="#cb7-78"></a><span class="co">#&gt; Missing value imputation by random forests</span></span>
+<span id="cb7-79"><a href="#cb7-79"></a><span class="co">#&gt; </span></span>
+<span id="cb7-80"><a href="#cb7-80"></a><span class="co">#&gt;   Variables to impute:       Sepal.Width, Species</span></span>
+<span id="cb7-81"><a href="#cb7-81"></a><span class="co">#&gt;   Variables used to impute:  Species</span></span>
+<span id="cb7-82"><a href="#cb7-82"></a><span class="co">#&gt; iter 1:  ..</span></span>
+<span id="cb7-83"><a href="#cb7-83"></a><span class="co">#&gt;   Sepal.Length Sepal.Width Petal.Length Petal.Width Species</span></span>
+<span id="cb7-84"><a href="#cb7-84"></a><span class="co">#&gt; 1          5.1         3.5           NA         0.2  setosa</span></span>
+<span id="cb7-85"><a href="#cb7-85"></a><span class="co">#&gt; 2          4.9         3.0          1.4          NA  setosa</span></span>
+<span id="cb7-86"><a href="#cb7-86"></a><span class="co">#&gt; 3          4.7         3.2          1.3         0.2  setosa</span></span>
+<span id="cb7-87"><a href="#cb7-87"></a><span class="co">#&gt; 4           NA         3.2           NA         0.2  setosa</span></span>
+<span id="cb7-88"><a href="#cb7-88"></a><span class="co">#&gt; 5          5.0         3.6          1.4          NA  setosa</span></span>
+<span id="cb7-89"><a href="#cb7-89"></a><span class="co">#&gt; 6          5.4         3.9           NA         0.4  setosa</span></span>
+<span id="cb7-90"><a href="#cb7-90"></a></span>
+<span id="cb7-91"><a href="#cb7-91"></a><span class="co"># Impute all variables univariatly</span></span>
+<span id="cb7-92"><a href="#cb7-92"></a><span class="kw">head</span>(m &lt;-<span class="st"> </span><span class="kw">missRanger</span>(irisWithNA, . <span class="op">~</span><span class="st"> </span><span class="dv">1</span>))</span>
+<span id="cb7-93"><a href="#cb7-93"></a><span class="co">#&gt; </span></span>
+<span id="cb7-94"><a href="#cb7-94"></a><span class="co">#&gt; Missing value imputation by random forests</span></span>
+<span id="cb7-95"><a href="#cb7-95"></a><span class="co">#&gt; </span></span>
+<span id="cb7-96"><a href="#cb7-96"></a><span class="co">#&gt;   Variables to impute:       Sepal.Length, Sepal.Width, Petal.Length, Petal.Width, Species</span></span>
+<span id="cb7-97"><a href="#cb7-97"></a><span class="co">#&gt;   Variables used to impute:  </span></span>
+<span id="cb7-98"><a href="#cb7-98"></a><span class="co">#&gt; iter 1:  .....</span></span>
+<span id="cb7-99"><a href="#cb7-99"></a><span class="co">#&gt;   Sepal.Length Sepal.Width Petal.Length Petal.Width Species</span></span>
+<span id="cb7-100"><a href="#cb7-100"></a><span class="co">#&gt; 1          5.1         3.5          6.0         0.2  setosa</span></span>
+<span id="cb7-101"><a href="#cb7-101"></a><span class="co">#&gt; 2          4.9         3.0          1.4         1.8  setosa</span></span>
+<span id="cb7-102"><a href="#cb7-102"></a><span class="co">#&gt; 3          4.7         3.2          1.3         0.2  setosa</span></span>
+<span id="cb7-103"><a href="#cb7-103"></a><span class="co">#&gt; 4          6.3         3.5          4.5         0.2  setosa</span></span>
+<span id="cb7-104"><a href="#cb7-104"></a><span class="co">#&gt; 5          5.0         3.6          1.4         1.8  setosa</span></span>
+<span id="cb7-105"><a href="#cb7-105"></a><span class="co">#&gt; 6          5.4         3.9          1.4         0.4  setosa</span></span></code></pre></div>
+</div>
+<div id="imputation-takes-too-much-time.-what-can-i-do" class="section level2">
+<h2>Imputation takes too much time. What can I do?</h2>
+<p><code>missRanger</code> is based on iteratively fitting random forests for each variable with missing values. Since the underlying random forest implementation <code>ranger</code> uses 500 trees per default, a huge number of trees might be calculated. For larger data sets, the overall process can take very long.</p>
+<p>Here are tweaks to make things faster:</p>
+<ul>
+<li><p>Use less trees, e.g. by setting <code>num.trees = 50</code>. Even one single tree might be sufficient. Typically, the number of iterations until convergence will increase with fewer trees though.</p></li>
+<li><p>Use smaller bootstrap samples by setting e.g. <code>sample.fraction = 0.1</code>.</p></li>
+<li><p>Use the less greedy <code>splitrule = &quot;extratrees&quot;</code>.</p></li>
+<li><p>Use a low tree depth <code>max.depth = 6</code>.</p></li>
+<li><p>Use large leafs, e.g. <code>min.node.size = 10000</code>.</p></li>
+<li><p>Use a low <code>max.iter</code>, e.g. 1 or 2.</p></li>
+</ul>
+<div id="examples-evaluated-on-a-normal-laptop-not-run-here" class="section level3">
+<h3>Examples evaluated on a normal laptop (not run here)</h3>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a><span class="kw">library</span>(ggplot2) <span class="co"># for diamonds data</span></span>
+<span id="cb8-2"><a href="#cb8-2"></a><span class="kw">dim</span>(diamonds) <span class="co"># 53940    10</span></span>
+<span id="cb8-3"><a href="#cb8-3"></a></span>
+<span id="cb8-4"><a href="#cb8-4"></a>diamonds_with_NA &lt;-<span class="st"> </span><span class="kw">generateNA</span>(diamonds)</span>
+<span id="cb8-5"><a href="#cb8-5"></a></span>
+<span id="cb8-6"><a href="#cb8-6"></a><span class="co"># Takes 270 seconds (10 * 500 trees per iteration!)</span></span>
+<span id="cb8-7"><a href="#cb8-7"></a><span class="kw">system.time</span>(m &lt;-<span class="st"> </span><span class="kw">missRanger</span>(diamonds_with_NA, <span class="dt">pmm.k =</span> <span class="dv">3</span>))</span>
+<span id="cb8-8"><a href="#cb8-8"></a></span>
+<span id="cb8-9"><a href="#cb8-9"></a><span class="co"># Takes 19 seconds</span></span>
+<span id="cb8-10"><a href="#cb8-10"></a><span class="kw">system.time</span>(m &lt;-<span class="st"> </span><span class="kw">missRanger</span>(diamonds_with_NA, <span class="dt">pmm.k =</span> <span class="dv">3</span>, <span class="dt">num.trees =</span> <span class="dv">50</span>))</span>
+<span id="cb8-11"><a href="#cb8-11"></a></span>
+<span id="cb8-12"><a href="#cb8-12"></a><span class="co"># Takes 7 seconds</span></span>
+<span id="cb8-13"><a href="#cb8-13"></a><span class="kw">system.time</span>(m &lt;-<span class="st"> </span><span class="kw">missRanger</span>(diamonds_with_NA, <span class="dt">pmm.k =</span> <span class="dv">3</span>, <span class="dt">num.trees =</span> <span class="dv">1</span>))</span>
+<span id="cb8-14"><a href="#cb8-14"></a></span>
+<span id="cb8-15"><a href="#cb8-15"></a><span class="co"># Takes 9 seconds</span></span>
+<span id="cb8-16"><a href="#cb8-16"></a><span class="kw">system.time</span>(m &lt;-<span class="st"> </span><span class="kw">missRanger</span>(diamonds_with_NA, <span class="dt">pmm.k =</span> <span class="dv">3</span>, <span class="dt">num.trees =</span> <span class="dv">50</span>, <span class="dt">sample.fraction =</span> <span class="fl">0.1</span>))</span></code></pre></div>
+</div>
+</div>
+<div id="trick-use-case.weights-to-weight-down-contribution-of-rows-with-many-missings" class="section level2">
+<h2>Trick: Use <code>case.weights</code> to weight down contribution of rows with many missings</h2>
+<p>Using the <code>case.weights</code> argument, you can pass case weights to the imputation models. This might be e.g. useful to weight down the contribution of rows with many missings.</p>
+<div id="example" class="section level3">
+<h3>Example</h3>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a><span class="co"># Count the number of non-missing values per row</span></span>
+<span id="cb9-2"><a href="#cb9-2"></a>non_miss &lt;-<span class="st"> </span><span class="kw">rowSums</span>(<span class="op">!</span><span class="kw">is.na</span>(irisWithNA))</span>
+<span id="cb9-3"><a href="#cb9-3"></a><span class="kw">table</span>(non_miss)</span>
+<span id="cb9-4"><a href="#cb9-4"></a><span class="co">#&gt; non_miss</span></span>
+<span id="cb9-5"><a href="#cb9-5"></a><span class="co">#&gt;  1  2  3  4  5 </span></span>
+<span id="cb9-6"><a href="#cb9-6"></a><span class="co">#&gt;  2  6 28 68 46</span></span>
+<span id="cb9-7"><a href="#cb9-7"></a></span>
+<span id="cb9-8"><a href="#cb9-8"></a><span class="co"># No weighting</span></span>
+<span id="cb9-9"><a href="#cb9-9"></a><span class="kw">head</span>(m &lt;-<span class="st"> </span><span class="kw">missRanger</span>(irisWithNA, <span class="dt">num.trees =</span> <span class="dv">20</span>, <span class="dt">pmm.k =</span> <span class="dv">3</span>, <span class="dt">seed =</span> <span class="dv">5</span>))</span>
+<span id="cb9-10"><a href="#cb9-10"></a><span class="co">#&gt; </span></span>
+<span id="cb9-11"><a href="#cb9-11"></a><span class="co">#&gt; Missing value imputation by random forests</span></span>
+<span id="cb9-12"><a href="#cb9-12"></a><span class="co">#&gt; </span></span>
+<span id="cb9-13"><a href="#cb9-13"></a><span class="co">#&gt;   Variables to impute:       Sepal.Length, Sepal.Width, Petal.Length, Petal.Width, Species</span></span>
+<span id="cb9-14"><a href="#cb9-14"></a><span class="co">#&gt;   Variables used to impute:  Sepal.Length, Sepal.Width, Petal.Length, Petal.Width, Species</span></span>
+<span id="cb9-15"><a href="#cb9-15"></a><span class="co">#&gt; iter 1:  .....</span></span>
+<span id="cb9-16"><a href="#cb9-16"></a><span class="co">#&gt; iter 2:  .....</span></span>
+<span id="cb9-17"><a href="#cb9-17"></a><span class="co">#&gt; iter 3:  .....</span></span>
+<span id="cb9-18"><a href="#cb9-18"></a><span class="co">#&gt; iter 4:  .....</span></span>
+<span id="cb9-19"><a href="#cb9-19"></a><span class="co">#&gt; iter 5:  .....</span></span>
+<span id="cb9-20"><a href="#cb9-20"></a><span class="co">#&gt; iter 6:  .....</span></span>
+<span id="cb9-21"><a href="#cb9-21"></a><span class="co">#&gt;   Sepal.Length Sepal.Width Petal.Length Petal.Width Species</span></span>
+<span id="cb9-22"><a href="#cb9-22"></a><span class="co">#&gt; 1          5.1         3.5          1.6         0.2  setosa</span></span>
+<span id="cb9-23"><a href="#cb9-23"></a><span class="co">#&gt; 2          4.9         3.0          1.4         0.1  setosa</span></span>
+<span id="cb9-24"><a href="#cb9-24"></a><span class="co">#&gt; 3          4.7         3.2          1.3         0.2  setosa</span></span>
+<span id="cb9-25"><a href="#cb9-25"></a><span class="co">#&gt; 4          4.9         3.7          1.4         0.2  setosa</span></span>
+<span id="cb9-26"><a href="#cb9-26"></a><span class="co">#&gt; 5          5.0         3.6          1.4         0.2  setosa</span></span>
+<span id="cb9-27"><a href="#cb9-27"></a><span class="co">#&gt; 6          5.4         3.9          1.5         0.4  setosa</span></span>
+<span id="cb9-28"><a href="#cb9-28"></a></span>
+<span id="cb9-29"><a href="#cb9-29"></a><span class="co"># Weighted by number of non-missing values per row. </span></span>
+<span id="cb9-30"><a href="#cb9-30"></a><span class="kw">head</span>(m &lt;-<span class="st"> </span><span class="kw">missRanger</span>(irisWithNA, <span class="dt">num.trees =</span> <span class="dv">20</span>, <span class="dt">pmm.k =</span> <span class="dv">3</span>, <span class="dt">seed =</span> <span class="dv">5</span>, <span class="dt">case.weights =</span> non_miss))</span>
+<span id="cb9-31"><a href="#cb9-31"></a><span class="co">#&gt; </span></span>
+<span id="cb9-32"><a href="#cb9-32"></a><span class="co">#&gt; Missing value imputation by random forests</span></span>
+<span id="cb9-33"><a href="#cb9-33"></a><span class="co">#&gt; </span></span>
+<span id="cb9-34"><a href="#cb9-34"></a><span class="co">#&gt;   Variables to impute:       Sepal.Length, Sepal.Width, Petal.Length, Petal.Width, Species</span></span>
+<span id="cb9-35"><a href="#cb9-35"></a><span class="co">#&gt;   Variables used to impute:  Sepal.Length, Sepal.Width, Petal.Length, Petal.Width, Species</span></span>
+<span id="cb9-36"><a href="#cb9-36"></a><span class="co">#&gt; iter 1:  .....</span></span>
+<span id="cb9-37"><a href="#cb9-37"></a><span class="co">#&gt; iter 2:  .....</span></span>
+<span id="cb9-38"><a href="#cb9-38"></a><span class="co">#&gt; iter 3:  .....</span></span>
+<span id="cb9-39"><a href="#cb9-39"></a><span class="co">#&gt; iter 4:  .....</span></span>
+<span id="cb9-40"><a href="#cb9-40"></a><span class="co">#&gt;   Sepal.Length Sepal.Width Petal.Length Petal.Width Species</span></span>
+<span id="cb9-41"><a href="#cb9-41"></a><span class="co">#&gt; 1          5.1         3.5          1.0         0.2  setosa</span></span>
+<span id="cb9-42"><a href="#cb9-42"></a><span class="co">#&gt; 2          4.9         3.0          1.4         0.2  setosa</span></span>
+<span id="cb9-43"><a href="#cb9-43"></a><span class="co">#&gt; 3          4.7         3.2          1.3         0.2  setosa</span></span>
+<span id="cb9-44"><a href="#cb9-44"></a><span class="co">#&gt; 4          5.4         3.4          1.4         0.2  setosa</span></span>
+<span id="cb9-45"><a href="#cb9-45"></a><span class="co">#&gt; 5          5.0         3.6          1.4         0.2  setosa</span></span>
+<span id="cb9-46"><a href="#cb9-46"></a><span class="co">#&gt; 6          5.4         3.9          1.3         0.4  setosa</span></span></code></pre></div>
+</div>
+</div>
+<div id="references" class="section level2 unnumbered">
+<h2>References</h2>
+<div id="refs" class="references">
+<div id="ref-rubin">
+<p>Rubin, D. B. 1987. <em>Multiple Imputation for Nonresponse in Surveys</em>. Wiley Series in Probability and Statistics. Wiley.</p>
+</div>
+<div id="ref-stekhoven">
+<p>Stekhoven, Daniel J., and Peter Buehlmann. 2011. “MissForest-non-parametric missing value imputation for mixed-type data.” <em>Bioinformatics</em> 28 (1): 112–18. <a href="https://doi.org/10.1093/bioinformatics/btr597">https://doi.org/10.1093/bioinformatics/btr597</a>.</p>
+</div>
+<div id="ref-wright">
+<p>Wright, Marvin, and Andreas Ziegler. 2017. “Ranger: A Fast Implementation of Random Forests for High Dimensional Data in C++ and R.” <em>Journal of Statistical Software, Articles</em> 77 (1): 1–17. <a href="https://doi.org/10.18637/jss.v077.i01">https://doi.org/10.18637/jss.v077.i01</a>.</p>
+</div>
+</div>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
