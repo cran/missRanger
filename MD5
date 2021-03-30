@@ -1,6 +1,6 @@
-bfee087b9ecbe93ba86cd500e8785165 *DESCRIPTION
+2d8a3c0f368dc91db184763eef47f8be *DESCRIPTION
 351cde8ab7433b3b988063b34d7c00ea *NAMESPACE
-cdad1a9b580c505de9a2ad6222917162 *NEWS.md
+d699a713f2208c6c63ec6aee0689e28a *NEWS.md
 494025a6fbb248a5aab7abbceb760b72 *R/generateNA.R
 b8c7b01891ad9d0975af88b17c15e681 *R/imputeUnivariate.R
 a08c2a0edf3daee2d9450c43d1442d08 *R/missRanger.R
@@ -9,13 +9,13 @@ b5c901e6e10f2aa297b9514b797b7423 *README.md
 fe4ecfd1592001d66717b6acf7667157 *build/vignette.rds
 339ad44ed2f622466c329600f7c754be *inst/doc/censored_variables.R
 9a3315e6d9c070c0f3e71e795c350aa2 *inst/doc/censored_variables.Rmd
-9533e4b3abb38c2ad97d1115a649ca3c *inst/doc/censored_variables.html
+a1af7e3beb2bbcc331bdf53d2dad109a *inst/doc/censored_variables.html
 031a11ccca45b68b0145672785baa560 *inst/doc/missRanger.R
 defc389a640d69c8b4a975a6d0a0e325 *inst/doc/missRanger.Rmd
-27db95c77525a4f858a22af060bd8507 *inst/doc/missRanger.html
+459a64f0b1426e3cdb5cfb545811e7c3 *inst/doc/missRanger.html
 3cff6d692ac4a612eadbed86cfc1ae34 *inst/doc/multiple_imputation.R
 83a88329f8edd211899ab7bc61acd3d5 *inst/doc/multiple_imputation.Rmd
-90364ca5621c542a1fbf6b6137bae9ae *inst/doc/multiple_imputation.html
+603b7a8f8945e26df83c011ad54142f1 *inst/doc/multiple_imputation.html
 9c5583a5465689f5c4c92bd765b9682c *man/convert.Rd
 2758fde70b36ff303ccd76a323f03191 *man/generateNA.Rd
 97786d00bfc43486d5e1e81fb677d788 *man/imputeUnivariate.Rd
@@ -26,7 +26,7 @@ ea108d0cbad10104a18f2aa0dc39f882 *man/typeof2.Rd
 fd85d61427497c028ff629d141f12d60 *tests/testthat.R
 6ed3d5ba67112486dee4eee213ef8727 *tests/testthat/test-generateNA.R
 78970bf938b499e00a6aa1bd63759f7d *tests/testthat/test-imputeUnivariate.R
-8fa149efa3c3a387d729c7531ab290df *tests/testthat/test-missRanger.R
+c4acae2d1d6eaf8350710d4823a6ed4c *tests/testthat/test-missRanger.R
 e9853f53fa6d546eef773e8a0342c74f *tests/testthat/test-pmm.R
 ba564996db48c43cc2707225698f8a1c *vignettes/biblio.bib
 9a3315e6d9c070c0f3e71e795c350aa2 *vignettes/censored_variables.Rmd

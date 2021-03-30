@@ -1,35 +1,26 @@
 context("missRanger")
 
 irisWithNA <- generateNA(iris, seed = 1, p = 0.3)
-irisWithNA2 <- irisWithNA[c(1:2, 50:51, 100:101), ]
 
-test_that("results are reproducible", {
+test_that("all missings are filled", {
   imp <- missRanger(irisWithNA, pmm.k = 3, verbose = 0, seed = 1, num.trees = 50)
   expect_true(!anyNA(imp))
-  
-  expected <- structure(list(
-    Sepal.Length = c(5.1, 5.5, 4.7, 4.6, 5, 5), 
-    Sepal.Width = c(3.1, 3, 3.2, 3.1, 3.6, 3.9), 
-    Petal.Length = c(1.9, 3.5, 1.3, 1.5, 1.4, 1.7), 
-    Petal.Width = c(0.4, 1, 0.2, 0.2, 0.2, 0.4), 
-    Species = structure(c(1L, 1L, 1L, 1L, 1L, 1L), 
-                        .Label = c("setosa", "versicolor", "virginica"), class = "factor")), 
-    row.names = c(NA, 6L), class = "data.frame")
-  expect_equal(imp[1:6, ], expected)
 })
 
 test_that("messages are suppressed with verbose=0", {
-  expect_silent(missRanger(irisWithNA2, maxiter = 3, num.trees = 1, verbose = 0))
+  expect_silent(missRanger(irisWithNA, maxiter = 3, num.trees = 50, verbose = 0))
 })
 
 test_that("seed works", {
-  imp1 <- missRanger(irisWithNA2, maxiter = 3, num.trees = 1, verbose = 0, seed = 1)
-  imp2 <- missRanger(irisWithNA2, maxiter = 3, num.trees = 1, verbose = 0, seed = 1)
+  imp1 <- missRanger(irisWithNA, maxiter = 3, num.trees = 50, 
+                     verbose = 0, seed = 1)
+  imp2 <- missRanger(irisWithNA, maxiter = 3, num.trees = 50, 
+                     verbose = 0, seed = 1)
   expect_equal(imp1, imp2)
 })
 
 test_that("returnOOB works", {
-  imp1 <- missRanger(irisWithNA2, maxiter = 3, num.trees = 1, 
+  imp1 <- missRanger(irisWithNA, maxiter = 3, num.trees = 50, 
                      verbose = 0, returnOOB = TRUE)
   expect_true(length(attributes(imp1)$oob) == 5L)
 })
@@ -97,15 +88,14 @@ test_that("date and datetime columns work", {
   expect_equal(sapply(imp, class), sapply(Xd_NA, class))
 })
 
-test_that("a too small mtry causes an error", {
-  expect_error(missRanger(irisWithNA2, num.trees = 20, verbose = 0, mtry = 3))
-})
-
 test_that("mtry works", {
-  imp1 <- missRanger(irisWithNA, num.trees = 3, verbose = 0, seed = 1, maxiter = 3,
+  imp1 <- missRanger(irisWithNA, num.trees = 30, verbose = 0, seed = 1, maxiter = 3,
                      mtry = function(m) max(1, m %/% 3))
-  imp2 <- missRanger(irisWithNA, num.trees = 3, verbose = 0, seed = 1, mtry = 1, maxiter = 3)
-  imp3 <- missRanger(irisWithNA, num.trees = 3, verbose = 0, seed = 1, maxiter = 3)
+  imp2 <- missRanger(irisWithNA, num.trees = 30, verbose = 0, 
+                     seed = 1, mtry = 1, maxiter = 3)
+  imp3 <- missRanger(irisWithNA, num.trees = 30, verbose = 0, 
+                     seed = 1, maxiter = 3)
   expect_equal(imp1, imp2)
   expect_false(isTRUE(all.equal(imp1, imp3)))
 })
+

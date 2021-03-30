@@ -1,3 +1,9 @@
+# missRanger 2.1.2 & 2.1.3
+
+## Maintainance update
+
+- Fixing failing unit tests.
+
 # missRanger 2.1.1
 
 ## Minor changes
