@@ -1,6 +1,33 @@
-# missRanger 2.1.2 & 2.1.3
+# missRanger 2.2.0
 
-## Maintainance update
+## Less dependencies
+
+- Removed {mice} from "suggested" packages.
+- Removed {dplyr} from "suggested" packages.
+- Removed {survival} from "suggested" packages.
+
+## Maintenance
+
+- Adding Github pages.
+- Introduction of Github actions.
+
+# missRanger 2.1.5 (not on CRAN)
+
+Maintenance release,
+
+- switching to testthat 3,
+- changing the package structure, and
+- bringing vignettes into right order.
+
+# missRanger 2.1.4 (not on CRAN)
+
+## Minor changes
+
+- Now using progress bar instead of "." to show progress (when verbose = 1).
+
+# missRanger 2.1.2 and 2.1.3
+
+## Maintenance update
 
 - Fixing failing unit tests.
 
