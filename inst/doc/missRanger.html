@@ -11,7 +11,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
 
-<meta name="date" content="2023-03-24" />
+<meta name="date" content="2023-04-28" />
 
 <title>Using missRanger</title>
 
@@ -360,7 +360,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 
 <h1 class="title toc-ignore">Using missRanger</h1>
-<h4 class="date">2023-03-24</h4>
+<h4 class="date">2023-04-28</h4>
 
 
 
@@ -414,7 +414,7 @@ frame.</p></li>
 <div id="usage" class="section level2">
 <h2>Usage</h2>
 <p>We first generate a data set with about 20% missing values per column
-and fill them again by <code>missRanger</code>.</p>
+and fill them again by <code>missRanger()</code>.</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(missRanger)</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">84553</span>)</span>
@@ -621,8 +621,8 @@ e.g. <code>min.node.size = 10000</code>.</p></li>
 <h2>Trick: Use <code>case.weights</code> to weight down contribution of
 rows with many missings</h2>
 <p>Using the <code>case.weights</code> argument, you can pass case
-weights to the imputation models. This might be e.g. useful to weight
-down the contribution of rows with many missings.</p>
+weights to the imputation models. This might be useful to weight down
+the contribution of rows with many missings.</p>
 <div id="example" class="section level3">
 <h3>Example</h3>
 <div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Count the number of non-missing values per row</span></span>

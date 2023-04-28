@@ -1,3 +1,8 @@
+# missRanger 2.2.1
+
+- Switch from `importFrom` to `::` code style
+- Documentation improved
+
 # missRanger 2.2.0
 
 ## Less dependencies
