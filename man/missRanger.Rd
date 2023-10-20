@@ -17,7 +17,7 @@ missRanger(
 )
 }
 \arguments{
-\item{data}{A \code{data.frame} or \code{tibble} with missing values to impute.}
+\item{data}{A \code{data.frame} with missing values to impute.}
 
 \item{formula}{A two-sided formula specifying variables to be imputed
 (left hand side) and variables used to impute (right hand side).
@@ -48,10 +48,9 @@ when the variables are imputed univariately.}
 
 \item{case.weights}{Vector with non-negative case weights.}
 
-\item{...}{Arguments passed to \code{ranger::ranger()}. If the data set is large,
+\item{...}{Arguments passed to \code{\link[ranger:ranger]{ranger::ranger()}}. If the data set is large,
 better use less trees (e.g. \code{num.trees = 20}) and/or a low value of
-\code{sample.fraction}.
-The following arguments are incompatible, amongst others:
+\code{sample.fraction}. The following arguments are incompatible, amongst others:
 \code{write.forest}, \code{probability}, \code{split.select.weights},
 \code{dependent.variable.name}, and \code{classification}.}
 }
@@ -59,14 +58,14 @@ The following arguments are incompatible, amongst others:
 An imputed \code{data.frame}.
 }
 \description{
-Uses the {ranger} package (Wright & Ziegler) to do fast missing value imputation by
+Uses the "ranger" package (Wright & Ziegler) to do fast missing value imputation by
 chained random forests, see Stekhoven & Buehlmann and Van Buuren & Groothuis-Oudshoorn.
 Between the iterative model fitting, it offers the option of predictive mean matching.
 This firstly avoids imputation with values not present in the original data
 (like a value 0.3334 in a 0-1 coded variable).
 Secondly, predictive mean matching tries to raise the variance in the resulting
 conditional distributions to a realistic level. This allows to do multiple imputation
-when repeating the call to \code{missRanger()}.
+when repeating the call to \code{\link[=missRanger]{missRanger()}}.
 The iterative chaining stops as soon as \code{maxiter} is reached or if the average
 out-of-bag estimate of performance stops improving.
 In the latter case, except for the first iteration, the second last (i.e. best)
@@ -74,12 +73,12 @@ imputed data is returned.
 }
 \details{
 A note on \code{mtry}: Be careful when passing a non-default \code{mtry} to
-\code{ranger()} because the number of available covariates might be growing during
+\code{\link[ranger:ranger]{ranger::ranger()}} because the number of available covariates might be growing during
 the first iteration, depending on the missing pattern.
 Values \code{NULL} (default) and 1 are safe choices.
-Additionally, recent versions of \code{ranger()} allow \code{mtry} to be a
+Additionally, recent versions of \code{\link[ranger:ranger]{ranger::ranger()}} allow \code{mtry} to be a
 single-argument function of the number of available covariables,
-e.g. \code{mtry = function(m) max(1, m \%/\% 3)}.
+e.g., \code{mtry = function(m) max(1, m \%/\% 3)}.
 }
 \examples{
 irisWithNA <- generateNA(iris, seed = 34)
@@ -89,8 +88,14 @@ head(irisWithNA)
 }
 \references{
 \enumerate{
-\item Wright, M. N. & Ziegler, A. (2016). ranger: A Fast Implementation of Random Forests for High Dimensional Data in C++ and R. Journal of Statistical Software, in press. <arxiv.org/abs/1508.04409>.
-\item Stekhoven, D.J. and Buehlmann, P. (2012). 'MissForest - nonparametric missing value imputation for mixed-type data', Bioinformatics, 28(1) 2012, 112-118. https://doi.org/10.1093/bioinformatics/btr597.
-\item Van Buuren, S., Groothuis-Oudshoorn, K. (2011). mice: Multivariate Imputation by Chained Equations in R. Journal of Statistical Software, 45(3), 1-67. http://www.jstatsoft.org/v45/i03/
+\item Wright, M. N. & Ziegler, A. (2016). ranger: A Fast Implementation of
+Random Forests for High Dimensional Data in C++ and R. Journal of Statistical
+Software, in press. <arxiv.org/abs/1508.04409>.
+\item Stekhoven, D.J. and Buehlmann, P. (2012). 'MissForest - nonparametric missing
+value imputation for mixed-type data', Bioinformatics, 28(1) 2012, 112-118.
+https://doi.org/10.1093/bioinformatics/btr597.
+\item Van Buuren, S., Groothuis-Oudshoorn, K. (2011). mice: Multivariate Imputation
+by Chained Equations in R. Journal of Statistical Software, 45(3), 1-67.
+http://www.jstatsoft.org/v45/i03/
 }
 }
