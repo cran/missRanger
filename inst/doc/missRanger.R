@@ -36,6 +36,12 @@ irisImputed_et <- missRanger(
 head(irisImputed_et)
 
 ## -----------------------------------------------------------------------------
+(imp <- missRanger(irisWithNA, data_only = FALSE, verbose = 0))
+
+# Summary
+summary(imp)
+
+## -----------------------------------------------------------------------------
 # Impute all variables with all (default behaviour). Note that variables without
 # missing values will be skipped from the left hand side of the formula.
 m <- missRanger(
