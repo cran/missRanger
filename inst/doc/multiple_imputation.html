@@ -11,7 +11,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
 
-<meta name="date" content="2023-11-19" />
+<meta name="date" content="2024-07-12" />
 
 <title>Multiple Imputation</title>
 
@@ -360,38 +360,32 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 
 <h1 class="title toc-ignore">Multiple Imputation</h1>
-<h4 class="date">2023-11-19</h4>
+<h4 class="date">2024-07-12</h4>
 
 
 
 <div id="how-to-use-missranger-for-multiple-imputation" class="section level2">
 <h2>How to use {missRanger} for multiple imputation?</h2>
-<p>For machine learning tasks, imputation is typically seen as a fixed
-data preparation step like dummy coding. There, multiple imputation is
-rarely applied as it adds another level of complexity to the analysis.
-This might be fine since a good validation schema will account for
-variation introduced by imputation.</p>
-<p>For tasks with focus on statistical inference (p values, standard
-errors, confidence intervals, estimation of effects), the extra
-variability introduced by imputation has to be accounted for except if
-only very few missing values appear. One of the standard approaches is
-to impute the data set multiple times, generating e.g. 10 or 100
-versions of a complete data set. Then, the intended analysis (t-test,
-linear model etc.) is applied independently to each of the complete data
-sets. Their results are combined afterward in a pooling step, usually by
-Rubin’s rule <span class="citation">(<a href="#ref-rubin">Rubin
-1987</a>)</span>. For parameter estimates, averages are taken. Their
-variance is basically a combination of the average squared standard
-errors plus the variance of the parameter estimates across the imputed
-data sets, leading to inflated standard errors and thus larger p values
-and wider confidence intervals.</p>
+<p>For statistical inference, extra variability introduced by imputation
+has to be accounted for. This is usually done by multiple
+imputation.</p>
+<p>One of the standard approaches is to impute the dataset multiple
+times, generating, e.g., 10 or 100 versions of the complete data. Then,
+the intended analysis (t-test, linear model etc.) is performed with each
+of the datasets. Their results are then pooled, usually by Rubin’s rule
+<span class="citation">(<a href="#ref-rubin">Rubin 1987</a>)</span>:
+Parameter <em>estimates</em> are averaged. Their <em>variances</em> are
+avaraged as well, and corrected upwards by adding the variance of the
+paramrter estimates across imputations.</p>
 <p>The package {mice} <span class="citation">(<a href="#ref-buuren">Buuren and Groothuis-Oudshoorn 2011</a>)</span> takes
 care of this pooling step. The creation of multiple complete data sets
 can be done by {mice} or also by {missRanger}. In the latter case, in
 order to keep the variance of imputed values at a realistic level, we
-suggest to use predictive mean matching on top of the random forest
-imputation.</p>
-<p>The following example shows how easy such workflow looks like.</p>
+suggest to use predictive mean matching with relatively large
+<code>pmm.k</code> on top of the random forest imputation.</p>
+</div>
+<div id="example" class="section level2">
+<h2>Example</h2>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(missRanger)</span>
 <span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="fu">library</span>(mice)</span>
 <span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a></span>
@@ -399,10 +393,10 @@ imputation.</p>
 <span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a></span>
 <span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a>irisWithNA <span class="ot">&lt;-</span> <span class="fu">generateNA</span>(iris, <span class="at">p =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">0.1</span>, <span class="fl">0.1</span>, <span class="fl">0.1</span>, <span class="fl">0.1</span>))</span>
 <span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a></span>
-<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a><span class="co"># Generate 20 complete data sets</span></span>
+<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a><span class="co"># Generate 20 complete data sets with relatively large pmm.k</span></span>
 <span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a>filled <span class="ot">&lt;-</span> <span class="fu">replicate</span>(</span>
 <span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a>  <span class="dv">20</span>, </span>
-<span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a>  <span class="fu">missRanger</span>(irisWithNA, <span class="at">verbose =</span> <span class="dv">0</span>, <span class="at">num.trees =</span> <span class="dv">50</span>, <span class="at">pmm.k =</span> <span class="dv">5</span>), </span>
+<span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a>  <span class="fu">missRanger</span>(irisWithNA, <span class="at">verbose =</span> <span class="dv">0</span>, <span class="at">num.trees =</span> <span class="dv">50</span>, <span class="at">pmm.k =</span> <span class="dv">10</span>), </span>
 <span id="cb1-12"><a href="#cb1-12" tabindex="-1"></a>  <span class="at">simplify =</span> <span class="cn">FALSE</span></span>
 <span id="cb1-13"><a href="#cb1-13" tabindex="-1"></a>)</span>
 <span id="cb1-14"><a href="#cb1-14" tabindex="-1"></a>                           </span>
@@ -412,13 +406,13 @@ imputation.</p>
 <span id="cb1-18"><a href="#cb1-18" tabindex="-1"></a><span class="co"># Pool the results by mice</span></span>
 <span id="cb1-19"><a href="#cb1-19" tabindex="-1"></a><span class="fu">summary</span>(pooled_fit <span class="ot">&lt;-</span> <span class="fu">pool</span>(models))</span>
 <span id="cb1-20"><a href="#cb1-20" tabindex="-1"></a></span>
-<span id="cb1-21"><a href="#cb1-21" tabindex="-1"></a><span class="co">#                term   estimate std.error  statistic       df      p.value</span></span>
-<span id="cb1-22"><a href="#cb1-22" tabindex="-1"></a><span class="co"># 1       (Intercept)  2.5366092 0.3575478  7.0944612 74.48225 6.365362e-10</span></span>
-<span id="cb1-23"><a href="#cb1-23" tabindex="-1"></a><span class="co"># 2       Sepal.Width  0.4262516 0.1104055  3.8607804 81.52526 2.253823e-04</span></span>
-<span id="cb1-24"><a href="#cb1-24" tabindex="-1"></a><span class="co"># 3      Petal.Length  0.7311306 0.0895942  8.1604670 60.04758 2.595957e-11</span></span>
-<span id="cb1-25"><a href="#cb1-25" tabindex="-1"></a><span class="co"># 4       Petal.Width -0.1840820 0.1856190 -0.9917193 68.08826 3.248458e-01</span></span>
-<span id="cb1-26"><a href="#cb1-26" tabindex="-1"></a><span class="co"># 5 Speciesversicolor -0.6755016 0.2907406 -2.3233824 82.80105 2.261132e-02</span></span>
-<span id="cb1-27"><a href="#cb1-27" tabindex="-1"></a><span class="co"># 6  Speciesvirginica -0.8584752 0.3970706 -2.1620217 81.93105 3.353349e-02</span></span>
+<span id="cb1-21"><a href="#cb1-21" tabindex="-1"></a><span class="co">#              term   estimate  std.error  statistic       df      p.value</span></span>
+<span id="cb1-22"><a href="#cb1-22" tabindex="-1"></a><span class="co">#       (Intercept)  2.4927868 0.34949255  7.1325891 80.75311 3.785713e-10</span></span>
+<span id="cb1-23"><a href="#cb1-23" tabindex="-1"></a><span class="co">#       Sepal.Width  0.4337064 0.10952987  3.9597088 78.74820 1.635231e-04</span></span>
+<span id="cb1-24"><a href="#cb1-24" tabindex="-1"></a><span class="co">#      Petal.Length  0.7362439 0.09201064  8.0017258 50.94966 1.453609e-10</span></span>
+<span id="cb1-25"><a href="#cb1-25" tabindex="-1"></a><span class="co">#       Petal.Width -0.1618100 0.18820061 -0.8597739 66.35077 3.930096e-01</span></span>
+<span id="cb1-26"><a href="#cb1-26" tabindex="-1"></a><span class="co"># Speciesversicolor -0.7050250 0.30099170 -2.3423403 69.11545 2.204973e-02</span></span>
+<span id="cb1-27"><a href="#cb1-27" tabindex="-1"></a><span class="co">#  Speciesvirginica -0.9125055 0.41666494 -2.1900224 66.90964 3.201281e-02</span></span>
 <span id="cb1-28"><a href="#cb1-28" tabindex="-1"></a></span>
 <span id="cb1-29"><a href="#cb1-29" tabindex="-1"></a><span class="co"># Compare with model on original data</span></span>
 <span id="cb1-30"><a href="#cb1-30" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">lm</span>(Sepal.Length <span class="sc">~</span> ., <span class="at">data =</span> iris))</span>
@@ -437,10 +431,8 @@ imputation.</p>
 <span id="cb1-43"><a href="#cb1-43" tabindex="-1"></a><span class="co"># Residual standard error: 0.3068 on 144 degrees of freedom</span></span>
 <span id="cb1-44"><a href="#cb1-44" tabindex="-1"></a><span class="co"># Multiple R-squared:  0.8673,  Adjusted R-squared:  0.8627 </span></span>
 <span id="cb1-45"><a href="#cb1-45" tabindex="-1"></a><span class="co"># F-statistic: 188.3 on 5 and 144 DF,  p-value: &lt; 2.2e-16</span></span></code></pre></div>
-<p>The standard errors and p values of the multiple imputation are
-larger than of the original data set. This reflects the additional
-uncertainty introduced by the presence of missing values in a realistic
-way.</p>
+<p>As expected, standard errors and p values of the multiple imputation
+are larger than of the original data set.</p>
 </div>
 <div id="references" class="section level2 unnumbered">
 <h2 class="unnumbered">References</h2>
