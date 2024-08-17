@@ -1,6 +1,6 @@
 Package: missRanger
 Title: Fast Imputation of Missing Values
-Version: 2.5.0
+Version: 2.6.0
 Authors@R: 
     person("Michael", "Mayer", , "mayermichael79@gmail.com", role = c("aut", "cre"))
 Description: Alternative implementation of the beautiful 'MissForest'
@@ -14,13 +14,12 @@ Description: Alternative implementation of the beautiful 'MissForest'
     predictive mean matching tries to raise the variance in the resulting
     conditional distributions to a realistic level. This would allow,
     e.g., to do multiple imputation when repeating the call to
-    missRanger().  A formula interface allows to control which variables
-    should be imputed by which.
+    missRanger(). Out-of-sample application is supported as well.
 License: GPL (>= 2)
 Depends: R (>= 3.5.0)
 Encoding: UTF-8
 RoxygenNote: 7.3.2
-Imports: FNN, ranger, stats, utils
+Imports: FNN, ranger (>= 0.16.0), stats, utils
 URL: https://github.com/mayer79/missRanger,
         https://mayer79.github.io/missRanger/
 BugReports: https://github.com/mayer79/missRanger/issues
@@ -28,8 +27,8 @@ Suggests: knitr, rmarkdown, testthat (>= 3.0.0)
 VignetteBuilder: knitr
 Config/testthat/edition: 3
 NeedsCompilation: no
-Packaged: 2024-07-12 15:19:53 UTC; Michael
+Packaged: 2024-08-17 15:06:25 UTC; Michael
 Author: Michael Mayer [aut, cre]
 Maintainer: Michael Mayer <mayermichael79@gmail.com>
 Repository: CRAN
-Date/Publication: 2024-07-12 19:40:02 UTC
+Date/Publication: 2024-08-17 15:50:05 UTC

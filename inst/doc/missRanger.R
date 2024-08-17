@@ -9,83 +9,50 @@ knitr::opts_chunk$set(
 ## -----------------------------------------------------------------------------
 library(missRanger)
 
-set.seed(84553)
+set.seed(3)
 
-head(iris)
-
-# Generate data with missing values in all columns
-irisWithNA <- generateNA(iris, p = 0.2)
-head(irisWithNA)
+iris_NA <- generateNA(iris, p = 0.1)
+head(iris_NA)
  
-# Impute missing values with missRanger
-irisImputed <- missRanger(irisWithNA, num.trees = 100, verbose = 0)
-head(irisImputed)
+imp <- missRanger(iris_NA, num.trees = 100)
+head(imp)
 
 ## -----------------------------------------------------------------------------
-irisImputed <- missRanger(irisWithNA, pmm.k = 3, num.trees = 100, verbose = 0)
-head(irisImputed)
+imp <- missRanger(iris_NA, pmm.k = 5, num.trees = 100, verbose = 0)
+head(imp)
 
 ## -----------------------------------------------------------------------------
-irisImputed_et <- missRanger(
-  irisWithNA, 
-  pmm.k = 3, 
-  splitrule = "extratrees", 
-  num.trees = 50, 
-  verbose = 0
+imp <- missRanger(iris_NA, pmm.k = 5, num.trees = 200, mtry = 1, verbose = 0)
+
+## -----------------------------------------------------------------------------
+imp <- missRanger(
+  iris_NA, pmm.k = 5, num.trees = 100, keep_forests = TRUE, verbose = 0
 )
-head(irisImputed_et)
+imp
 
-## -----------------------------------------------------------------------------
-(imp <- missRanger(irisWithNA, data_only = FALSE, verbose = 0))
-
-# Summary
 summary(imp)
 
-## -----------------------------------------------------------------------------
-# Impute all variables with all (default behaviour). Note that variables without
-# missing values will be skipped from the left hand side of the formula.
-m <- missRanger(
-  irisWithNA, formula = . ~ ., pmm.k = 3, num.trees = 10, seed = 1, verbose = 0
-)
-head(m)
-
-# Same
-m <- missRanger(irisWithNA, pmm.k = 3, num.trees = 10, seed = 1, verbose = 0)
-head(m)
-
-# Impute all variables with all except Species
-m <- missRanger(irisWithNA, . ~ . - Species, pmm.k = 3, num.trees = 10, verbose = 0)
-head(m)
-
-# Impute Sepal.Width by Species 
-m <- missRanger(
-  irisWithNA, Sepal.Width ~ Species, pmm.k = 3, num.trees = 10, verbose = 0
-)
-head(m)
-
-# No success. Why? Species contains missing values and thus can only 
-# be used for imputation if it is being imputed as well
-m <- missRanger(
-  irisWithNA, Sepal.Width + Species ~ Species, pmm.k = 3, num.trees = 10, verbose = 0
-)
-head(m)
-
-# Impute all variables univariatly
-m <- missRanger(irisWithNA, . ~ 1, verbose = 0)
-head(m)
+# Out-of-sample application
+# saveRDS(imp, file = "imputation_model.rds")
+# imp <- readRDS("imputation_model.rds")
+predict(imp, head(iris_NA))
 
 ## -----------------------------------------------------------------------------
-# Count the number of non-missing values per row
-non_miss <- rowSums(!is.na(irisWithNA))
-table(non_miss)
+# Impute all variables with all (default)
+m <- missRanger(iris_NA, formula = . ~ ., pmm.k = 5, num.trees = 100, verbose = 0)
 
-# No weighting
-m <- missRanger(irisWithNA, num.trees = 20, pmm.k = 3, seed = 5, verbose = 0)
+# Don't use Species for imputation
+m <- missRanger(iris_NA, . ~ . - Species, pmm.k = 5, num.trees = 100, verbose = 0)
+
+# Impute Sepal.Length by Species (or not?)
+m <- missRanger(iris_NA, Sepal.Length ~ Species, pmm.k = 5, num.trees = 100)
 head(m)
 
-# Weighted by number of non-missing values per row. 
-m <- missRanger(
-  irisWithNA, num.trees = 20, pmm.k = 3, seed = 5, verbose = 0, case.weights = non_miss
-)
+# Only univariate imputation was done! Why? Because Species contains missing values
+# itself and needs to appear on the LHS as well:
+m <- missRanger(iris_NA, Sepal.Length + Species ~ Species, pmm.k = 5, num.trees = 100)
 head(m)
+
+# Impute all variables univariately
+m <- missRanger(iris_NA, . ~ 1, verbose = 0)
 

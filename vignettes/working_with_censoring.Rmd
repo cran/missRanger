@@ -21,26 +21,22 @@ knitr::opts_chunk$set(
 
 ## How to deal with censored variables?
 
-There is no obvious way of how to deal with survival variables as covariables in imputation models. 
+There is no obvious way of how to deal with survival variables as covariates in imputation models. Options discussed in [@white] include:
 
-Options discussed in [@white] include:
+- Use the status variable $s$ and the (censored) time variable $t$.
+- Use $s$ and $\log(t)$.
+- Use $\text{surv}(t)$, and, optionally $s$.
 
-- Use both status variable $s$ and (censored) time variable $t$
-
-- $s$ and $\log(t)$
-
-- $\text{surv}(t)$, and, optionally $s$
-
-By $\text{surv}(t)$, we denote the Nelson-Aalen survival estimate at each value of $t$. The third option is the most elegant one as it explicitly deals with censoring information. We provide some additional details on it in the example.
+By $\text{surv}(t)$, we denote the Nelson-Aalen survival estimate at each value of $t$. The third option seems attractive as it explicitly deals with censoring information. We provide some additional details on it in the example.
 
 ### Example
 
-For illustration, we use data from a randomized two-arm trial about lung cancer. The aim is to estimate the treatment effect of "trt" with reliable inference using Cox regression. Unfortunately, we have added missing values in the covariables "age", "karno", and "diagtime". 
+For illustration, we use data from a randomized two-arm trial about lung cancer. The aim is to estimate the treatment effect of "trt" with reliable inference using Cox regression. We add missing values in the covariates "age", "karno", and "diagtime".
 
-A reasonable way to estimate the covariable adjusted treatment effect is the following:
+Let's estimate the covariate adjusted treatment effect using the following steps:
 
 1. Add Nelson-Aalen survival estimates "surv" to the dataset.
-2. Use "surv" as well as the covariables to impute missing values in the covariables multiple times.
+2. Use "surv" as well as the covariates to impute missing values in the covariates multiple times.
 3. Perform the intended Cox regression for each of the imputed data sets.
 4. Pool their results by Rubin's rule [@rubin], using package {mice} [@buuren].
 
@@ -62,14 +58,12 @@ head(veteran)
 # 6   1 squamous   10      1    20        5  49     0
 
 # 1. Calculate Nelson-Aalen survival probabilities for each time point
-nelson_aalen <- summary(
-  survfit(Surv(time, status) ~ 1, data = veteran), 
-  times = unique(veteran$time)
-)[c("time", "surv")]
-nelson_aalen <- data.frame(nelson_aalen)
+nelson_aalen <- survfit(Surv(time, status) ~ 1, data = veteran) |>
+  summary(times = unique(veteran$time))
+nelson_aalen <- nelson_aalen[c("time", "surv")]
 
 # Add it to the original data set
-veteran2 <- merge(veteran, nelson_aalen, all.x = TRUE)
+veteran2 <- merge(veteran, nelson_aalen, all.x = TRUE, by = "time")
 
 # Add missing values to make things tricky
 veteran2 <- generateNA(veteran2, p = c(age = 0.1, karno = 0.1, diagtime = 0.1))
@@ -77,12 +71,7 @@ veteran2 <- generateNA(veteran2, p = c(age = 0.1, karno = 0.1, diagtime = 0.1))
 # 2. Generate 20 complete data sets, representing "time" and "status" by "surv"
 filled <- replicate(
   20, 
-  missRanger(
-    veteran2, . ~ . - time - status, 
-    verbose = 0, 
-    pmm.k = 3, 
-    num.trees = 25
-  ), 
+  missRanger(veteran2, . ~ . - time - status, verbose = 0, pmm.k = 10, num.trees = 100), 
   simplify = FALSE
 )
 
@@ -92,15 +81,15 @@ models <- lapply(filled, function(x) coxph(Surv(time, status) ~ . - surv, x))
 # 4. Pool the results by mice
 summary(pooled_fit <- pool(models))
 
-#                term     estimate   std.error  statistic        df      p.value
-# 1               trt  0.245855250 0.212810467  1.1552780 108.72929 2.505091e-01
-# 2 celltypesmallcell  0.805233656 0.284424937  2.8310937 114.17088 5.483657e-03
-# 3     celltypeadeno  1.110172771 0.307570269  3.6094931 111.91588 4.603422e-04
-# 4     celltypelarge  0.328227283 0.291163500  1.1272954 109.30510 2.620862e-01
-# 5             karno -0.031838682 0.005663349 -5.6218824 112.60325 1.390333e-07
-# 6          diagtime  0.002775351 0.009382270  0.2958081  86.61582 7.680847e-01
-# 7               age -0.007843577 0.009293988 -0.8439410 107.86917 4.005701e-01
-# 8             prior  0.003165245 0.023501821  0.1346809 111.84783 8.931063e-01
+#                term     estimate   std.error  statistic       df      p.value
+# 1               trt  0.231154077 0.214672763  1.0767741 105.1514 2.840454e-01
+# 2 celltypesmallcell  0.805824737 0.285571376  2.8217980 114.1273 5.634607e-03
+# 3     celltypeadeno  1.130585762 0.306698637  3.6863084 113.3636 3.506786e-04
+# 4     celltypelarge  0.340627347 0.296740520  1.1478963 103.4753 2.536583e-01
+# 5             karno -0.030623274 0.005653790 -5.4164149 106.3603 3.806255e-07
+# 6          diagtime  0.001273007 0.009102230  0.1398566 108.7518 8.890320e-01
+# 7               age -0.005587627 0.009379064 -0.5957554 105.3053 5.526170e-01
+# 8             prior  0.005174395 0.023433186  0.2208148 112.4847 8.256369e-01
 
 # Compare with the results on the original data
 summary(coxph(Surv(time, status) ~ ., veteran))$coefficients

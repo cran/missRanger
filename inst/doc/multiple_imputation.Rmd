@@ -23,9 +23,9 @@ knitr::opts_chunk$set(
 
 For statistical inference, extra variability introduced by imputation has to be accounted for. This is usually done by multiple imputation.
 
-One of the standard approaches is to impute the dataset multiple times, generating, e.g., 10 or 100 versions of the complete data. Then, the intended analysis (t-test, linear model etc.) is performed with each of the datasets. Their results are then pooled, usually by Rubin's rule [@rubin]: Parameter *estimates* are averaged. Their *variances* are avaraged as well, and corrected upwards by adding the variance of the paramrter estimates across imputations.
+One of the standard approaches is to impute the dataset multiple times, generating, e.g., 10 or 100 versions of the complete data. Then, the intended analysis (t-test, linear model etc.) is performed with each of the datasets. Their results are then pooled, usually by Rubin's rule [@rubin]: Parameter *estimates* are averaged. Their *variances* are avaraged as well, and corrected upwards by adding the variance of the parameter estimates across imputations.
 
-The package {mice} [@buuren] takes care of this pooling step. The creation of multiple complete data sets can be done by {mice} or also by {missRanger}. In the latter case, in order to keep the variance of imputed values at a realistic level, we suggest to use predictive mean matching with relatively large `pmm.k` on top of the random forest imputation. 
+The package {mice} [@buuren] takes care of this pooling step. The creation of multiple complete data sets can be done by {mice} or also by {missRanger}. In the latter case, in order to keep the variance of imputed values at a more realistic level, we suggest to use predictive mean matching with relatively large `pmm.k` on top of the random forest imputation. 
 
 ## Example
 
@@ -35,12 +35,12 @@ library(mice)
 
 set.seed(19)
 
-irisWithNA <- generateNA(iris, p = c(0, 0.1, 0.1, 0.1, 0.1))
+iris_NA <- generateNA(iris, p = c(0, 0.1, 0.1, 0.1, 0.1))
 
 # Generate 20 complete data sets with relatively large pmm.k
 filled <- replicate(
   20, 
-  missRanger(irisWithNA, verbose = 0, num.trees = 50, pmm.k = 10), 
+  missRanger(iris_NA, verbose = 0, num.trees = 100, pmm.k = 10), 
   simplify = FALSE
 )
                            
@@ -50,13 +50,13 @@ models <- lapply(filled, function(x) lm(Sepal.Length ~ ., x))
 # Pool the results by mice
 summary(pooled_fit <- pool(models))
 
-#              term   estimate  std.error  statistic       df      p.value
-#       (Intercept)  2.4927868 0.34949255  7.1325891 80.75311 3.785713e-10
-#       Sepal.Width  0.4337064 0.10952987  3.9597088 78.74820 1.635231e-04
-#      Petal.Length  0.7362439 0.09201064  8.0017258 50.94966 1.453609e-10
-#       Petal.Width -0.1618100 0.18820061 -0.8597739 66.35077 3.930096e-01
-# Speciesversicolor -0.7050250 0.30099170 -2.3423403 69.11545 2.204973e-02
-#  Speciesvirginica -0.9125055 0.41666494 -2.1900224 66.90964 3.201281e-02
+#                term   estimate std.error statistic        df      p.value
+# 1       (Intercept)  2.3343548 0.3244342  7.195157  97.08106 1.314353e-10
+# 2       Sepal.Width  0.4715273 0.1041384  4.527891  88.55776 1.848669e-05
+# 3      Petal.Length  0.7700316 0.0768588 10.018783 122.02953 1.321441e-17
+# 4       Petal.Width -0.2506538 0.1739537 -1.440922  88.10220 1.531513e-01
+# 5 Speciesversicolor -0.6648375 0.2940828 -2.260715  81.17797 2.645368e-02
+# 6  Speciesvirginica -0.9065327 0.4055137 -2.235517  79.87581 2.817491e-02
 
 # Compare with model on original data
 summary(lm(Sepal.Length ~ ., data = iris))
@@ -77,6 +77,6 @@ summary(lm(Sepal.Length ~ ., data = iris))
 # F-statistic: 188.3 on 5 and 144 DF,  p-value: < 2.2e-16
 ```
 
-As expected, standard errors and p values of the multiple imputation are larger than of the original data set.
+As expected, inference from multiple imputation seems to be less strong than of the original data without missings.
 
 ## References
